@@ -68,3 +68,5 @@ C:\Users\gabri\source\repos\APICatalogo\APICatalogo\obj\Debug\net6.0\refint\APIC
 C:\Users\gabri\source\repos\APICatalogo\APICatalogo\obj\Debug\net6.0\APICatalogo.pdb
 C:\Users\gabri\source\repos\APICatalogo\APICatalogo\obj\Debug\net6.0\APICatalogo.genruntimeconfig.cache
 C:\Users\gabri\source\repos\APICatalogo\APICatalogo\obj\Debug\net6.0\ref\APICatalogo.dll
+C:\Users\gabri\source\repos\APICatalogo\APICatalogo\bin\Debug\net6.0\AutoMapper.dll
+C:\Users\gabri\source\repos\APICatalogo\APICatalogo\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll

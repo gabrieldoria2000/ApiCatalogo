@@ -1,5 +1,7 @@
 using APICatalogo.Context;
+using APICatalogo.DTOs.Mappings;
 using APICatalogo.Filters;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -15,6 +17,16 @@ builder.Services.AddControllers()
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//----------REGISTRA O SEEVIÇO DE MAPEAMENTO DO DTO
+var mappingConfig = new MapperConfiguration(mc =>
+{
+    mc.AddProfile(new MappingProfile());
+});
+IMapper mapper = mappingConfig.CreateMapper();
+builder.Services.AddSingleton(mapper);
+//singleton - só tem uma instancia desse serviço para requisições no projeto
+//--------------------------------------------------
 
 builder.Services.AddScoped<ApiLoggingFilters>();
 

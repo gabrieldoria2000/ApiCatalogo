@@ -1,6 +1,8 @@
 ﻿using APICatalogo.Context;
+using APICatalogo.DTOs;
 using APICatalogo.Filters;
 using APICatalogo.Models;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +17,14 @@ namespace APICatalogo.Controllers
 
         private readonly IConfiguration _config;
 
+        private readonly IMapper _mapper;
+
         //Injetar a instancia do contexto no controlador
-        public ProdutosController(AppDbContext context, IConfiguration config)
+        public ProdutosController(AppDbContext context, IConfiguration config, IMapper mapper)
         {
             _Context = context;
             _config = config;
+            _mapper = mapper;
         }
 
         //pegar variaveis do arquivo de configuração
@@ -35,71 +40,88 @@ namespace APICatalogo.Controllers
         //produtos
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilters))]
-        public ActionResult<IEnumerable<Produto>> get()
+        public ActionResult<IEnumerable<ProdutoDTO>> get()
         {
             //Abraça com o ActionResult para que o método possa retornar 2 tipos diferentes de resultados: 
             //um enumerable ou um NotFound.
             var prod = _Context.Produtos.AsNoTracking().ToList();
 
+            var prodDto = _mapper.Map<List<ProdutoDTO>>(prod);
+
             if (prod is null)
             {
                 return NotFound("Produtos não encontrados");
             }
-            return prod;
+            //o usuario vai ver as informações de produtoDTO
+            return prodDto;
         }
 
         //produtos/id - RESTRIÇÃO DE ROTA: valores inteiros e maiores que 1. É bom pra evitar que um roteamento seja feito
         //desnecessariamente. Dessa forma, uma consulta desnecessária é evitada no BD
         [HttpGet("{id:int:min(1)}", Name ="obterProduto")]
-        public ActionResult<Produto> Get(int id)
+        public ActionResult<ProdutoDTO> Get(int id)
         {
             var prod = _Context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
+
+            var prodDto = _mapper.Map < ProdutoDTO > (prod);
 
             if (prod is null)
             {
                 return NotFound("Produto não encontrado");
             }
-            return prod;
+            return prodDto;
         }
 
         //produtos
         [HttpPost]
-        public ActionResult Post(Produto prod)
+        public ActionResult Post(ProdutoDTO prodDTO)
         {
-            if (prod is null)
+            var produto = _mapper.Map<Produto>(prodDTO);
+
+            //atenção...quando for "falar" com o BD, tem que ser Produto mesmo. O BD não entende o DTO
+
+            if (produto is null)
             {
                 return BadRequest();
             }
-            _Context.Produtos.Add(prod);
+            _Context.Produtos.Add(produto);
             _Context.SaveChanges();
 
             //esse método CreatedAtRouteResult já retorna o endpoint(URI) do produto criado
             //o nome da rota será obterProduto
-            return new CreatedAtRouteResult("obterProduto", new { id = prod.ProdutoId }, prod);
+
+            var produtoDTO = _mapper.Map<ProdutoDTO>(produto);
+
+            //vai exibir para o usuario NÃO Produto, mas ProdutoDTO
+            return new CreatedAtRouteResult("obterProduto", new { id = produto.ProdutoId }, produtoDTO);
         }
 
         [HttpPut("/produtos/{id}")]
-        public ActionResult Put(int id, Produto prod)
+        public ActionResult Put(int id, ProdutoDTO prodDTO)
         {
-            if (id != prod.ProdutoId)
+
+            if (id != prodDTO.ProdutoId)
             {
                 return BadRequest();
             }
+
+            var produto = _mapper.Map<Produto>(prodDTO);
+
             //Como estamos trabalhando em um cenário desconectado, o contexto precisa ser informado
             //que a entidade produto está num estado modificado, pra ele poder alterar...Pra isso usa
             //o método Entry
 
-            _Context.Entry(prod).State = EntityState.Modified;
+            _Context.Entry(produto).State = EntityState.Modified;
 
             //Dessa forma o Entity framework core vai saber que essa entidade precisa ser persistida
 
             _Context.SaveChanges();
 
-            return Ok(prod);
+            return Ok(prodDTO);
         }
 
         [HttpDelete("{id:int}")]
-        public ActionResult Delete(int id)
+        public ActionResult<ProdutoDTO> Delete(int id)
         {
             //var prod = _Context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
 
@@ -115,7 +137,9 @@ namespace APICatalogo.Controllers
             _Context.Produtos.Remove(prod);
             _Context.SaveChanges();
 
-            return Ok(prod);
+            var produtoDTO = _mapper.Map<Produto>(prod);
+
+            return Ok(produtoDTO);
         }
 
 

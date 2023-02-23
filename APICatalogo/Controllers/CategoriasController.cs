@@ -11,9 +11,11 @@ namespace APICatalogo.Controllers;
 public class CategoriasController : ControllerBase
 {
     private readonly AppDbContext _context;
-    public CategoriasController(AppDbContext context)
+    private readonly ILogger _logger;
+    public CategoriasController(AppDbContext context, ILogger<CategoriasController> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -39,6 +41,9 @@ public class CategoriasController : ControllerBase
     {
         //o método de extenção include permite carregar entidades relacionadas :)
         //var cat = _context.Categorias.Include(p=> p.Produtos).ToList();
+
+       // _logger.LogInformation($"###### GET API CATEGORIAS PRODUTOS ########### {DateTime.Now}");
+
 
         var cat = _context.Categorias.Include(p => p.Produtos).Where(c => c.CategoriaId <=5).ToList();
 
