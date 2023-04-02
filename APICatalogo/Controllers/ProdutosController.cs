@@ -2,6 +2,8 @@
 using APICatalogo.DTOs;
 using APICatalogo.Filters;
 using APICatalogo.Models;
+using APICatalogo.Pagination;
+using APICatalogo.Repository;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -40,11 +42,22 @@ namespace APICatalogo.Controllers
         //produtos
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilters))]
-        public ActionResult<IEnumerable<ProdutoDTO>> get()
+        public ActionResult<IEnumerable<ProdutoDTO>> get([FromQuery] ProdutosParameters prdPatameters)
         {
             //Abraça com o ActionResult para que o método possa retornar 2 tipos diferentes de resultados: 
             //um enumerable ou um NotFound.
             var prod = _Context.Produtos.AsNoTracking().ToList();
+
+            //var prod = ProdutoRepository.GetProdutos(prdPatameters).ToList();
+
+            //var metadata = new
+            //{
+            //    prod.totalCount.
+            //    prod.pagesize
+            //    etc
+            //}
+
+            //Response.Headers.Add("X-Paginacao", jsonConvert.SerializableObject(metadata));
 
             var prodDto = _mapper.Map<List<ProdutoDTO>>(prod);
 

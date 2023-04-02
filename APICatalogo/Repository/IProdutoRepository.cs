@@ -1,4 +1,5 @@
 ﻿using APICatalogo.Models;
+using APICatalogo.Pagination;
 
 namespace APICatalogo.Repository
 {
@@ -7,5 +8,7 @@ namespace APICatalogo.Repository
 
         //define um método específico
         IEnumerable<Produto> GetProdutosporPreco();
+
+        PagedList<Produto> GetProdutos(ProdutosParameters prdParameters);
     }
 }

@@ -19,6 +19,7 @@ namespace APICatalogo.Models
         public string? Descricao { get; set; }
 
         [Required]
+        [DataType(DataType.Currency)]
         [Column(TypeName = "decimal(10,2)")]
         public decimal Preco { get; set; }
 
